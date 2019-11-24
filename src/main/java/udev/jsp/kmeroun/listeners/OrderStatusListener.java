@@ -1,6 +1,6 @@
-package udev.jsp.kmeroun.model.listener;
+package udev.jsp.kmeroun.listeners;
 
-import udev.jsp.kmeroun.model.event.OrderStatusChangedEvent;
+import udev.jsp.kmeroun.events.OrderStatusChangedEvent;
 
 import java.util.EventListener;
 

@@ -1,6 +1,6 @@
-package udev.jsp.kmeroun.model.event;
+package udev.jsp.kmeroun.events;
 
-import udev.jsp.kmeroun.model.OrderStatus;
+import udev.jsp.kmeroun.enums.OrderStatus;
 
 import java.util.EventObject;
 
