@@ -3,21 +3,22 @@ package udev.jsp.kmeroun.dao;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import udev.jsp.kmeroun.models.Order;
+import udev.jsp.kmeroun.enums.OrderStatus;
+import udev.jsp.kmeroun.models.Cart;
 import udev.jsp.kmeroun.models.User;
 import udev.jsp.kmeroun.utils.HibernateSessionFactory;
 
 import java.util.List;
 
-public class OrderDao implements DaoInterface<Order, Integer> {
+public class CartDao implements DaoInterface<Cart, Integer> {
 
     @Override
-    public void save(Order order) {
+    public void save(Cart cart) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.save(order);
+            session.save(cart);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -30,12 +31,12 @@ public class OrderDao implements DaoInterface<Order, Integer> {
     }
 
     @Override
-    public void update(Order order) {
+    public void update(Cart cart) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.update(order);
+            session.update(cart);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -48,12 +49,12 @@ public class OrderDao implements DaoInterface<Order, Integer> {
     }
 
     @Override
-    public void delete(Order order) {
+    public void delete(Cart cart) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.delete(session.load(Order.class, order.getId()));
+            session.delete(session.load(Cart.class, cart.getId()));
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -66,15 +67,15 @@ public class OrderDao implements DaoInterface<Order, Integer> {
     }
 
     @Override
-    public Order get(Integer id) {
+    public Cart get(Integer id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        Order order = null;
+        Cart cart = null;
         try{
             tx = session.beginTransaction();
-            order = session.load(Order.class, id);
+            cart = session.load(Cart.class, id);
             tx.commit();
-            return order;
+            return cart;
         } catch(Exception e){
             if(tx != null){
                 tx.rollback();
@@ -83,18 +84,18 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         } finally{
             session.close();
         }
-        return order;
+        return cart;
     }
 
-    public List findCurrent(User user) {
+    public Cart findCurrent(User user) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        List orders = null;
+        Cart cart = null;
         try{
             tx = session.beginTransaction();
-            Query query = session.createQuery("from Order where customer.id = :u");
+            Query query = session.createQuery("from Cart where customer.id = :u and Order.id is null");
             query.setParameter("u", user.getId());
-            orders = query.list();
+            cart = (Cart) query.getSingleResult();
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -104,18 +105,18 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         } finally{
             session.close();
         }
-        return orders;
+        return cart;
     }
 
     @Override
     public List findAll() {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        List orders = null;
+        List carts = null;
         try{
             tx = session.beginTransaction();
-            Query query = session.createQuery("from Order");
-            orders = query.getResultList();
+            Query query = session.createQuery("from Cart");
+            carts = query.getResultList();
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -125,7 +126,7 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         } finally{
             session.close();
         }
-        return orders;
+        return carts;
     }
 
     @Override
@@ -134,7 +135,7 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.createQuery("delete from Order");
+            session.createQuery("delete from Cart");
             tx.commit();
         } catch(Exception e){
             if(tx != null){

@@ -6,45 +6,12 @@ import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Table(name = "dishes")
 @Entity
-@Table(name="dishes")
-public class Dish implements Serializable {
+public class Dish extends Product implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="id", unique = true)
-    private int id;
-
-    @Column(name="name", unique = true)
-    private String name;
-
-    @Column(name="price")
-    private double price;
-
-    public Dish(){}
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public Dish(){
+        super();
     }
 
     @Override

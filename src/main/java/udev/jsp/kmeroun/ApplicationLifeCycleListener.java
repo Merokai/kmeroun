@@ -1,5 +1,6 @@
 package udev.jsp.kmeroun;
 
+import udev.jsp.kmeroun.models.Dish;
 import udev.jsp.kmeroun.utils.HibernateSessionFactory;
 
 import javax.servlet.ServletContextEvent;

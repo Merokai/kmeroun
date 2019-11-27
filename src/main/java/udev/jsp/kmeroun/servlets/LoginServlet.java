@@ -1,44 +1,47 @@
 package udev.jsp.kmeroun.servlets;
 
 import udev.jsp.kmeroun.dao.UserDao;
-import udev.jsp.kmeroun.models.Dish;
 import udev.jsp.kmeroun.models.User;
 import udev.jsp.kmeroun.utils.HttpBodyParser;
-import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 import udev.jsp.kmeroun.utils.PasswordHash;
-import udev.jsp.kmeroun.utils.UserRequest;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.stream.Collectors;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+    private static final UserDao userDao = new UserDao();
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        UserRequest.requireJsonParameter(User.class, request, response, (req, res) -> {
-            User user = (User)req.getAttribute("jsonObject");
+        login(request, response);
+    }
 
-            // Try to authenticate user
-            UserDao userDao = new UserDao();
-            User dbUser = userDao.get(user.getUsername());
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("WEB-INF/userInfo.jsp").forward(request, response);
+    }
 
-            // username not found or bad password
-            if (dbUser == null || !PasswordHash.getInstance().verifyPassword(user.getPassword(), dbUser.getPassword())) {
-                res.setStatus(404);
-                return;
-            }
+    private void login(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        User user = User.fromString(HttpBodyParser.parse(request));
+        User dbUser = null;
 
-            // Login OK, set up session attribute
-            req.getSession().setAttribute("user", dbUser);
-            res.setStatus(200);
-            res.setContentType("application/json");
-            res.getWriter().append(dbUser.toString());
-        });
+        try {
+            dbUser = userDao.getByUsername(user.getUsername());
+        } catch (PersistenceException e){
+            response.sendError(404);
+            return;
+        }
+
+        if(dbUser == null || !PasswordHash.getInstance().verifyPassword(user.getPassword(), dbUser.getPassword())) {
+            response.sendError(404);
+            return;
+        }
+
+        request.getSession().setAttribute("user", dbUser);
+        request.getRequestDispatcher("WEB-INF/userInfo.jsp").forward(request, response);
     }
 }

@@ -3,12 +3,15 @@ package udev.jsp.kmeroun.models;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.hibernate.annotations.NaturalId;
 import udev.jsp.kmeroun.enums.Role;
 import udev.jsp.kmeroun.utils.JacksonObjectMapper;
+import udev.jsp.kmeroun.utils.PasswordHash;
 
+import javax.annotation.Generated;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 
 @Entity
@@ -16,40 +19,37 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
-    @NaturalId
-    @Column(name = "username", unique = true)
+    @GeneratedValue
+    private int id;
+
+    @Column(name = "user_unique_name", unique = true, nullable = false)
     private String username;
 
+    @Column(name = "user_password", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(name = "password")
     private String password;
 
-    @Column(name="lastName")
-    private String lastName;
+    @Column(name = "user_lastname", nullable = false)
+    private String lastname;
 
-    @Column(name="firstName")
-    private String firstName;
+    @Column(name = "user_firstname", nullable = false)
+    private String firstname;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="role")
+    @Column(name = "user_role")
     private Role role;
 
     public User(){}
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public User(String username, String password, String firstname, String lastname) {
+        this.username = username;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        try {
+            this.password = PasswordHash.getInstance().generateHashedPassword(password);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     public Role getRole() {
@@ -74,6 +74,30 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
     @Override

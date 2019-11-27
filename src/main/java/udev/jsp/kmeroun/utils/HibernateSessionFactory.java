@@ -9,10 +9,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 
-import udev.jsp.kmeroun.models.Dish;
-import udev.jsp.kmeroun.models.OrderRow;
-import udev.jsp.kmeroun.models.Order;
-import udev.jsp.kmeroun.models.User;
+import udev.jsp.kmeroun.models.*;
 
 public class HibernateSessionFactory {
 
@@ -33,12 +30,12 @@ public class HibernateSessionFactory {
 
                 configuration.setProperties(settings);
 
+                configuration.addAnnotatedClass(Product.class);
                 configuration.addAnnotatedClass(Dish.class);
-                configuration.addAnnotatedClass(OrderRow.class);
                 configuration.addAnnotatedClass(User.class);
+                configuration.addAnnotatedClass(CartItem.class);
+                configuration.addAnnotatedClass(Cart.class);
                 configuration.addAnnotatedClass(Order.class);
-                configuration.addAnnotatedClass(SerializableArrayList.class);
-
 
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties()).build();
