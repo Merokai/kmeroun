@@ -3,41 +3,22 @@ package udev.jsp.kmeroun.dao;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import udev.jsp.kmeroun.models.Cart;
+import udev.jsp.kmeroun.models.CartItem;
 import udev.jsp.kmeroun.models.User;
 import udev.jsp.kmeroun.utils.HibernateSessionFactory;
 
 import java.util.List;
 
-public class UserDao implements DaoInterface<User, Integer> {
-
-    public User getByUsername(String username) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
-        Transaction tx = null;
-        User user = null;
-        try{
-            tx = session.beginTransaction();
-            Query query = session.createQuery("from User as u where u.username = :username");
-            query.setParameter("username", username);
-            user = (User) query.getSingleResult();
-            tx.commit();
-        } catch(Exception e){
-            if(tx != null){
-                tx.rollback();
-                throw e;
-            }
-        } finally{
-            session.close();
-        }
-        return user;
-    }
+public class CartItemDao implements DaoInterface<CartItem, Integer> {
 
     @Override
-    public void save(User user) {
+    public void save(CartItem cartItem) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.save(user);
+            session.save(cartItem);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -50,12 +31,12 @@ public class UserDao implements DaoInterface<User, Integer> {
     }
 
     @Override
-    public void update(User user) {
+    public void update(CartItem cartItem) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.update(user);
+            session.update(cartItem);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -73,7 +54,7 @@ public class UserDao implements DaoInterface<User, Integer> {
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.createQuery("delete from User where id = :id");
+            session.createQuery("delete from CartItem where id = :id");
             session.setProperty("id", id);
             tx.commit();
         } catch(Exception e){
@@ -87,44 +68,42 @@ public class UserDao implements DaoInterface<User, Integer> {
     }
 
     @Override
-    public User get(Integer id) {
+    public CartItem get(Integer id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        User user = null;
+        CartItem cartitem = null;
         try{
             tx = session.beginTransaction();
-            user = session.load(User.class, id);
+            cartitem = session.load(CartItem.class, id);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
                 tx.rollback();
-                throw e;
             }
         } finally{
             session.close();
         }
-        return user;
+        return cartitem;
     }
 
     @Override
-    public List<User> findAll() {
+    public List findAll() {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        List<User> users = null;
+        List carts = null;
         try{
             tx = session.beginTransaction();
-            Query query = session.createQuery("select u.username, u.firstname, u.lastname from User as u");
-            users = query.list();
+            Query query = session.createQuery("from CartItem");
+            carts = query.getResultList();
             tx.commit();
         } catch(Exception e){
             if(tx != null){
                 tx.rollback();
-                throw e;
             }
         } finally{
             session.close();
         }
-        return users;
+        return carts;
     }
 
     @Override
@@ -133,7 +112,7 @@ public class UserDao implements DaoInterface<User, Integer> {
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.createQuery("delete from User");
+            session.createQuery("delete from CartItem");
             tx.commit();
         } catch(Exception e){
             if(tx != null){

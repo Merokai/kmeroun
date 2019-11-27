@@ -9,7 +9,7 @@ public interface DaoInterface<T, Id extends Serializable> {
 
     public void update(T entity);
 
-    public void delete(T entity);
+    public void delete(Id id);
 
     public T get(Id id);
 

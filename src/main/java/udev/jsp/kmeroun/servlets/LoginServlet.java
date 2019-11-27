@@ -1,7 +1,10 @@
 package udev.jsp.kmeroun.servlets;
 
 import udev.jsp.kmeroun.dao.UserDao;
+import udev.jsp.kmeroun.enums.Role;
 import udev.jsp.kmeroun.models.User;
+import udev.jsp.kmeroun.servlets.HttpRequestValidator.HttpRequestValidator;
+import udev.jsp.kmeroun.servlets.HttpRequestValidator.UserHasRole;
 import udev.jsp.kmeroun.utils.HttpBodyParser;
 import udev.jsp.kmeroun.utils.PasswordHash;
 
@@ -22,6 +25,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpRequestValidator.validate(request, response, this::getUserInfo, new UserHasRole(Role.CUSTOMER, Role.MANAGER));
         request.getRequestDispatcher("WEB-INF/userInfo.jsp").forward(request, response);
     }
 
@@ -42,6 +46,10 @@ public class LoginServlet extends HttpServlet {
         }
 
         request.getSession().setAttribute("user", dbUser);
-        request.getRequestDispatcher("WEB-INF/userInfo.jsp").forward(request, response);
+        getUserInfo(request, response);
+    }
+
+    private void getUserInfo(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        req.getRequestDispatcher("WEB-INF/userInfo.jsp").forward(req, res);
     }
 }

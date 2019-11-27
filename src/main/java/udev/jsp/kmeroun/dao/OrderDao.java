@@ -18,6 +18,7 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         try{
             tx = session.beginTransaction();
             session.save(order);
+            session.update(order.getCart());
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -48,12 +49,13 @@ public class OrderDao implements DaoInterface<Order, Integer> {
     }
 
     @Override
-    public void delete(Order order) {
+    public void delete(Integer id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.delete(session.load(Order.class, order.getId()));
+            session.createQuery("delete from Order where id = :id");
+            session.setProperty("id", id);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -115,6 +117,27 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         try{
             tx = session.beginTransaction();
             Query query = session.createQuery("from Order");
+            orders = query.getResultList();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
+        }
+        return orders;
+    }
+
+    public List findAllForUser(User user) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        List orders = null;
+        try{
+            tx = session.beginTransaction();
+            Query query = session.createQuery("from Order inner join Cart where customer.id = :u");
+            query.setParameter("u", user.getId());
             orders = query.getResultList();
             tx.commit();
         } catch(Exception e){

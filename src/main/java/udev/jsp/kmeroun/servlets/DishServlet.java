@@ -1,9 +1,9 @@
 package udev.jsp.kmeroun.servlets;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import udev.jsp.kmeroun.dao.DishDao;
 import udev.jsp.kmeroun.enums.Role;
 import udev.jsp.kmeroun.models.Dish;
-import udev.jsp.kmeroun.models.User;
 import udev.jsp.kmeroun.servlets.HttpRequestValidator.HttpRequestValidator;
 import udev.jsp.kmeroun.servlets.HttpRequestValidator.UserHasRole;
 import udev.jsp.kmeroun.utils.HttpBodyParser;
@@ -22,61 +22,90 @@ import java.io.IOException;
 public class DishServlet extends HttpServlet {
     private static final DishDao dishDao = new DishDao();
 
+    /**
+     * Create a new dish
+     * Require Manager role
+     * Require Dish as request body content
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpRequestValidator.validate(request, response, (req, res) ->{
-                saveDish(request, response);
-        }, new UserHasRole(Role.MANAGER));
+        HttpRequestValidator.validate(request, response, this::saveDish, new UserHasRole(Role.MANAGER));
     }
 
+    /**
+     * Get all the dishes
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         getDishes(request, response);
 
     }
 
+    /**
+     * Update an existing dish
+     * Require logged in MANAGER
+     * Require dish "id" PUT parameter
+     * Require dish as json body content
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpRequestValidator.validate(request, response, (req, res) ->{
-                updateDish(req, res);
-        }, new UserHasRole(Role.MANAGER));
+        HttpRequestValidator.validate(request, response, this::updateDish, new UserHasRole(Role.MANAGER));
     }
 
+    /**
+     * Delete an existing dish
+     * Require logged in MANAGER
+     * Require dish "id" DELETE parameter
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpRequestValidator.validate(request, response, (req, res) ->{
-                deleteDish(req, res);
-        }, new UserHasRole(Role.MANAGER));
-    }
-
-    private Role getCurrentUserRole(HttpServletRequest request) throws ServletException, IOException {
-        User user = (User) request.getSession().getAttribute("user");
-        if(user == null){
-            return Role.GUEST;
-        }
-        return user.getRole();
+        HttpRequestValidator.validate(request, response, this::deleteDish, new UserHasRole(Role.MANAGER));
     }
 
     private void saveDish(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Dish dish = Dish.fromString(HttpBodyParser.parse(request));
         try{
+            Dish dish = Dish.fromString(HttpBodyParser.parse(request));
             dishDao.save(dish);
-        } catch(PersistenceException e){
-            response.sendError(409);
+        } catch (JsonProcessingException e){ // Invalid Json
+            response.sendError(400);
+        } catch (PersistenceException e){ // Database constraint violation
+            response.sendError(400);
         }
     }
 
     private void updateDish(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Dish dish = Dish.fromString(HttpBodyParser.parse(request));
         try{
+            Dish dish = Dish.fromString(HttpBodyParser.parse(request));
+            dish.setId(Integer.parseInt(request.getParameter("id")));
             dishDao.update(dish);
-        } catch(PersistenceException e){
-            response.sendError(409);
+        } catch (NumberFormatException e){ // Invalid id
+            response.sendError(400);
+        } catch (JsonProcessingException e){ // Invalid Json
+            response.sendError(400);
+        } catch (PersistenceException e){ // Database constraint violation
+            response.sendError(400);
         }
     }
 
     private void deleteDish(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Dish dish = Dish.fromString(HttpBodyParser.parse(request));
         try{
-            dishDao.delete(dish);
-        } catch(PersistenceException e){
-            response.sendError(404);
+            dishDao.delete(Integer.parseInt(request.getParameter("id")));
+        } catch (NumberFormatException e){ // Invalid id
+            response.sendError(400);
+        } catch (PersistenceException e){ // Database constraint violation
+            response.sendError(400);
         }
     }
 

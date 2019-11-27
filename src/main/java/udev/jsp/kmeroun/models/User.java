@@ -20,6 +20,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
     @Column(name = "user_unique_name", unique = true, nullable = false)

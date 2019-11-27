@@ -49,12 +49,13 @@ public class CartDao implements DaoInterface<Cart, Integer> {
     }
 
     @Override
-    public void delete(Cart cart) {
+    public void delete(Integer id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.delete(session.load(Cart.class, cart.getId()));
+            session.createQuery("delete from Cart where id = :id");
+            session.setProperty("id", id);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -79,7 +80,6 @@ public class CartDao implements DaoInterface<Cart, Integer> {
         } catch(Exception e){
             if(tx != null){
                 tx.rollback();
-                throw e;
             }
         } finally{
             session.close();
@@ -93,14 +93,13 @@ public class CartDao implements DaoInterface<Cart, Integer> {
         Cart cart = null;
         try{
             tx = session.beginTransaction();
-            Query query = session.createQuery("from Cart where customer.id = :u and Order.id is null");
+            Query query = session.createQuery("from Cart where customer.id = :u and order is null");
             query.setParameter("u", user.getId());
             cart = (Cart) query.getSingleResult();
             tx.commit();
         } catch(Exception e){
             if(tx != null){
                 tx.rollback();
-                throw e;
             }
         } finally{
             session.close();
@@ -121,7 +120,6 @@ public class CartDao implements DaoInterface<Cart, Integer> {
         } catch(Exception e){
             if(tx != null){
                 tx.rollback();
-                throw e;
             }
         } finally{
             session.close();

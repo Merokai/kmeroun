@@ -2,6 +2,8 @@ package udev.jsp.kmeroun.models;
 
 import java.io.Serializable;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,11 +20,12 @@ public class Cart implements Serializable {
     @JsonIgnore
     @Column(name = "cart_id")
     @GeneratedValue
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "customer_id")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private User customer;
 
     @JsonIgnore
@@ -35,6 +38,10 @@ public class Cart implements Serializable {
     private List<CartItem> cartItems = new SerializableArrayList<>();;
 
     public Cart(){}
+
+    public Cart(User user){
+        this.customer = user;
+    }
 
     public int getId() {
         return id;

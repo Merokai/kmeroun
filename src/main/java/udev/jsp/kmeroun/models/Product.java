@@ -16,6 +16,7 @@ public class Product implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "product_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
 

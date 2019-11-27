@@ -2,6 +2,7 @@ package udev.jsp.kmeroun.models;
 
 import java.time.LocalDate;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import udev.jsp.kmeroun.enums.OrderStatus;
@@ -21,9 +22,10 @@ public class Order implements Serializable {
     @JsonIgnore
     @Column(name = "order_id")
     @GeneratedValue
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
-    @OneToOne(optional = true)
+    @OneToOne(orphanRemoval = true)
     @JoinColumn(name="cart_id")
     private Cart cart;
 
@@ -34,7 +36,7 @@ public class Order implements Serializable {
 
     @Column(name = "order_creation", nullable = false)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private LocalDate createdOn;
+    private LocalDateTime createdOn;
 
     public Order(){
         super();
@@ -48,11 +50,11 @@ public class Order implements Serializable {
         this.status = status;
     }
 
-    public LocalDate getCreatedOn() {
+    public LocalDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDate createdOn) {
+    public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
     }
 

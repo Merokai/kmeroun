@@ -21,6 +21,7 @@ public class CartItem implements Serializable {
 
     @Id
     @Column(name = "cartItem_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue
     private int id;
 

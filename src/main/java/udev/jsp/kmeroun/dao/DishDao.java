@@ -47,12 +47,13 @@ public class DishDao implements DaoInterface<Dish, Integer> {
     }
 
     @Override
-    public void delete(Dish dish) {
+    public void delete(Integer id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.delete(session.load(Dish.class, dish.getId()));
+            session.createQuery("delete from Dish where id = :id");
+            session.setProperty("id", id);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
