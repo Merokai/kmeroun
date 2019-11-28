@@ -40,34 +40,46 @@ Vue.component('containercomponent',{
 });
 Vue.component('menutitrecomponent',{
     template:`
-    <div>
-    <div v-if="isAdmin">
-        <form class="ajoutPlat">
-            <div class="platPicForm">
-                <label for="platPic">Image: 
-                </label>
-                <input id="platPic" type="text" v-model="plat.picture">
-            </div>
-            <div class="nomPlatForm">
-                <label for="nomPlat">Nom du plat:
-                </label>
-                <input id="nomPlat" type="text" v-model="plat.nom">
-            </div>
-            <div class="descriptionPlatDiv">
-                <label for="descriptionPlat">Description: 
-                </label>
-                <input id="descriptionPlat" type="textarea" v-model="plat.description">
-            </div>
-           
-        </form>
-    </div>
+    <div class="titre">
+        <div v-if="isAdmin">
+            <form class="ajoutPlat">
+                <div class="platPicForm">
+                    <label for="picture">Image: 
+                    </label>
+                   <input id="picture" type="text">
+                 </div>
+                <div class="nomPlatForm">
+                    <label for="nom">Nom du plat:
+                    </label>
+                    <input id="nom" type="text">
+                </div>
+                <div class="descriptionPlatDiv">
+                    <label for="description">Description: 
+                    </label>
+                    <input id="description" type="text">
+                </div>
+                <div class="prixPlat">
+                    <label for="prix">Prix</label>
+                    <input id="prix" type="number">
+                </div>
+                <button v-on:click.stop.prevent="saveNewDish">Enregistrer</button>
+            </form>
+        </div>
         <div v-else class="titre">
             <h1> La carte du jour </h1>
             <componentseparator></componentseparator>
         </div>
-        </div>
+    </div>
     `,
-    props:['isAdmin',"plats"]
+    props:['isAdmin',"plats"],
+    methods:{
+        saveNewDish(){
+            newId=Date.now();
+            newDish={id:newId,nom:nom.value,picture:picture.value,description:description.value,prix:prix.value,nombre:0};
+            console.log(newDish.id);
+            this.$parent.plats.push(newDish);
+        }
+    }
 });
 Vue.component('platcomponent',{
     template:`
@@ -93,37 +105,38 @@ Vue.component('platcomponent',{
             </div>
             <div v-else class="modifierplat">
             <form class="modifiePlatForm">
-            <div class="platPicForm">
-            <label for="platPic">Image: </label>
-            <input id="platPic" type="text" v-model="plat.picture">
-            </div>
-            <div class="nomPlatForm">
-            <label for="nomPlat">Nom du plat:</label>
-            <input id="nomPlat" type="text" v-model="plat.nom">
-            </div>
-            <div class="descriptionPlatDiv">
-            <label for="descriptionPlat">Description: </label>
-            <input id="descriptionPlat" type="textarea" v-model="plat.description">
-            </div>
-            <button class="validerChangePlat" v-on:click="validerChangePlat">Valider</button>
-            <button class="supprimerPlat" v-on:click.stop.prevent="supprimerPlat">Supprimer</button>
-            </form>
+                 <div class="platPicForm">
+                    <label for="picture">Image: </label>
+                    <input id="picture" type="text" v-model="plat.picture">
+                </div>
+                <div class="nomPlatForm">
+                    <label for="nom">Nom du plat:</label>
+                    <input id="nom" type="text" v-model="plat.nom">
+                </div> 
+                <div class="descriptionPlatDiv">
+                <label for="description">Description: </label>
+                <input id="description" type="textarea" v-model="plat.description">
+                </div>
+                </form>
+            <button class="validerChangePlat" v-on:click="validerChangePlat(plat.id)">Valider</button>
+            <button class="supprimerPlat" v-on:click.stop.prevent="supprimerPlat(plat.id)">Supprimer</button>
+            
             </div>
         </div>
     </div>
     `,
         props:['plat','isAdmin'],
         methods:{
-            validerChangePlat(){
+            validerChangePlat(id){
+                const plats=this.$parent.plats;
+                const getPlat=plats.find(plat=>plat.id===id)
+                console.log(description.value);
+                plats[this.$parent.plats.indexOf(getPlat)]={id:getPlat,nom:nom.value,picture:picture.value,description:description.value,prix:prix.value,nombre:0};
+                
             },
-            supprimerPlat(plat){    
-                const newPlats=plats.filter((t)=>{
-                    return plat.id !=t.id
-                });
-                plats=newPlats;
+            supprimerPlat(id){  
+                this.$parent.plats=this.$parent.plats.filter(plat=>plat.id !==id)
             }}
-
-        
 });
 Vue.component('componenthoraires',{
     template:`
@@ -241,8 +254,8 @@ var app=new Vue({
         isAdmin:true,
         counter:0,
         plats:[
-            {id:1,nom:'Bongo’o tjobi', picture:'./photosPlats/Mbongo.jpg',description:' Poisson frais ou viande (au choix) assaisonné d\'un mélange d\'épices et sauce noire',prix:9,nombre:0},
-            {id:2,nom:'Kpem',picture:'./photosPlats/Kpem.jpg', description:'Base de feuilles de manioc pilées, de jus de noix de palme et d\'aubergines africaines.',prix:10,nombre:0}
+            {id:Date.now(),nom:'Bongo’o tjobi', picture:'./photosPlats/Mbongo.jpg',description:' Poisson frais ou viande (au choix) assaisonné d\'un mélange d\'épices et sauce noire',prix:9,nombre:0},
+            {id:Date.now()+1,nom:'Kpem',picture:'./photosPlats/Kpem.jpg', description:'Base de feuilles de manioc pilées, de jus de noix de palme et d\'aubergines africaines.',prix:10,nombre:0}
         ],
         days:[{id:1,nom:'Lundi', ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
               {id:2,nom:"Mardi", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
@@ -251,7 +264,8 @@ var app=new Vue({
               {id:5,nom:"Vendredi", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
               {id:6,nom:"Samedi", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
               {id:7,nom:"Dimanche", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"}
-            ]
+            ],
+        listeCommande:[]
     },
     methods:{
         loginoff(){
@@ -264,5 +278,6 @@ var app=new Vue({
             this.isAdmin=!this.isAdmin;
             console.log("Admin:"+this.isAdmin);
         }
+
     }
 });

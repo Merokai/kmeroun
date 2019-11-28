@@ -222,3 +222,8 @@ display:flex;
 flex-wrap: wrap;
 justify-content: space-between;
 }
+.ajoutPlat{
+	display:flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}

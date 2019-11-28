@@ -39,8 +39,8 @@
                 </div>    
             </aside>
             <section class="Menu">
-               <menutitrecomponent></menutitrecomponent v-bind:is-admin="isAdmin" v-bind:plats="plats">
-                <platcomponent v-for="plat in plats" v-bind:key='plat.id' v-bind:plat='plat' v-bind:is-admin="isAdmin">
+               <menutitrecomponent v-bind:is-admin="isAdmin"></menutitrecomponent>
+                <platcomponent v-for="(plat,id) in plats" v-bind:key='plat.id' v-bind:plat='plat' v-bind:is-admin="isAdmin">
             </platcomponent>
             </section>
         </div>
@@ -50,3 +50,4 @@
 <script src="app.js"></script>
 </body>
 </html>
+
