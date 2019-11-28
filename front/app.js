@@ -1,3 +1,26 @@
+Vue.component('loginofcomponent',{
+    template:`
+    <div>
+    <button v-on:click="loginoff">Login: {{logIn}}</button>
+<button v-on:click="adminoff">Admin:{{isAdmin}}</button>
+<button v-on:clik="stateChanges">State:{{logIn}} {{isAdmin}}</button>
+</div>    
+`,
+    methods:{
+        loginoff(){
+            this.$parent.loginoff();
+        },
+        adminoff(){
+            this.$parent.adminoff();
+        },
+        stateChanges(){
+            console.log("plop");
+            console.log(this.logIn +" " + this.isAdmin)
+        }
+    },
+    props:['logIn','isAdmin']
+});
+
 Vue.component('containercomponent',{
     template:`
     <div class="container">
@@ -42,11 +65,27 @@ Vue.component('componenthoraires',{
   <span>{{day.ouvertureMatin}}-{{day.fermetureMidi}}</span>
   <span>{{day.ouvertureSoir}}-{{day.fermeturesoir}}</span>
   </div>
+  
 `,
-props:['day'],
-methods:{}
-
+props:['day']
 });
+Vue.component('componentchangehoraires',{
+    template:`
+    <div class="day">
+    <div class="nameDay">
+    {{day.nom}}
+    </div>
+    <div class="matin">Matin:
+    <input class="time" type="text" maxlength="5" placeholder="00:00">-<input class="time" type="text" maxlength="5" placeholder="00:00">
+    </div>
+    <div class="soir">
+    Soir:
+    <input class="time" type="text" maxlength="5" placeholder="00:00" v-model=day.ouvertureSoir>-<input class="time" type="text" maxlength="5" placeholder="00:00">
+    </div>
+    </div>
+    `,
+    props:['day']
+})
 Vue.component('logincomponent',{
     template:`
     <div class="connexion">
@@ -131,8 +170,9 @@ Vue.component('componentseparator',{
 var app=new Vue({
     el:'#app',
     data:{
-        logIn:'true',
-        isAdmin:'false',
+        logIn:false,
+        isAdmin:false,
+        counter:0,
         plats:[
             {id:1,nom:'Bongo’o tjobi', picture:'./photosPlats/Mbongo.jpg',description:' Poisson frais ou viande (au choix) assaisonné d\'un mélange d\'épices et sauce noire'},
             {id:2,nom:'Kpem',picture:'./photosPlats/Kpem.jpg', description:'Base de feuilles de manioc pilées, de jus de noix de palme et d\'aubergines africaines.'}
@@ -145,5 +185,18 @@ var app=new Vue({
               {id:6,nom:"Samedi", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
               {id:7,nom:"Dimanche", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"}
             ]
+    },
+    methods:{
+        loginoff(){
+           
+            this.logIn=!this.logIn;
+            console.log("Login:"+this.logIn);
+        },
+        adminoff(){
+            
+            this.isAdmin=!this.isAdmin;
+            console.log("Admin:"+this.isAdmin);
+            
+        }
     }
 });

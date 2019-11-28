@@ -19,18 +19,25 @@
     <main>
         <div class="contenu">
             <aside class="barreGauche">
-                <logincomponent v-if="logIn=='false'">
+                <loginofcomponent></loginofcomponent>
+                <logincomponent v-if="logIn">
                 </logincomponent>
-                <admincomponent v-else-if="logIn=='true'&& isAdmin=='true'">
+                <admincomponent v-else-if="logIn && isAdmin">
                 </admincomponent>
-                <commandecomponent v-else-if="logIn=='true'"> 
+                <commandecomponent v-else-if="logIn"> 
                 </commandecomponent>
                 <componentseparator></componentseparator>
                <coordoneescomponent></coordoneescomponent>
                 <componentseparator></componentseparator>
                 <div class="horaires">
                         <h3 class="titreHoraires"> Horaires d'ouverture </h3>
-                        <componenthoraires v-for="day in days" v-bind:key='day.id' v-bind:day="day"></componenthoraires>
+                        <componenthoraires v-if="!isAdmin" v-for="day in days" v-bind:key='day.id' v-bind:day="day"></componenthoraires>
+                        <form v-if="isAdmin">
+                            <componentchangehoraires v-for="day in days" v-bind:key='day.id' v-bind:day="day">
+
+                            </componentchangehoraires>
+                            <button>Envoyer</button>
+                        </form>
                 </div>
                       
             </aside>
