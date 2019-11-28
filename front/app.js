@@ -3,7 +3,7 @@ Vue.component('loginofcomponent',{
     <div>
     <button v-on:click="loginoff">Login: {{logIn}}</button>
 <button v-on:click="adminoff">Admin:{{isAdmin}}</button>
-<button v-on:clik="stateChanges">State:{{logIn}} {{isAdmin}}</button>
+<button v-on:click="stateChanges">State:{{logIn}} {{isAdmin}}</button>
 </div>    
 `,
     methods:{
@@ -15,7 +15,7 @@ Vue.component('loginofcomponent',{
         },
         stateChanges(){
             console.log("plop");
-            console.log(this.logIn +" " + this.isAdmin)
+            console.log(this.logIn +" " + this.isAdmin);
         }
     },
     props:['logIn','isAdmin']
@@ -35,28 +35,95 @@ Vue.component('containercomponent',{
             accroche:'Manger africain sur le pouce, c\'est possible à Toulouse.',
             containertext:"Le K Méroun vous concocte des plats épicés à partir de produits locaux et livrés d'Afrique.",
             containertext2:"Commandez sur place ou à emporter"
-        }
+        };
     }
 });
 Vue.component('menutitrecomponent',{
-    template:`<div class="titre">
-    <h1> La carte du jour </h1>
-    <componentseparator></componentseparator>
-    </div>`
+    template:`
+    <div>
+    <div v-if="isAdmin">
+        <form class="ajoutPlat">
+            <div class="platPicForm">
+                <label for="platPic">Image: 
+                </label>
+                <input id="platPic" type="text" v-model="plat.picture">
+            </div>
+            <div class="nomPlatForm">
+                <label for="nomPlat">Nom du plat:
+                </label>
+                <input id="nomPlat" type="text" v-model="plat.nom">
+            </div>
+            <div class="descriptionPlatDiv">
+                <label for="descriptionPlat">Description: 
+                </label>
+                <input id="descriptionPlat" type="textarea" v-model="plat.description">
+            </div>
+           
+        </form>
+    </div>
+        <div v-else class="titre">
+            <h1> La carte du jour </h1>
+            <componentseparator></componentseparator>
+        </div>
+        </div>
+    `,
+    props:['isAdmin',"plats"]
 });
 Vue.component('platcomponent',{
     template:`
     <div class="element">
-    <div class="image">
-    <img v-bind:src="plat.picture" v-bind:alt="plat.nom">
-    </div>
-    <div class="platText">
-       <h2 class="nomPlat"> {{plat.nom}}</h2>
-       <p class="description">{{plat.description}}</p>
-    </div>
+        <div class="image">
+            <img v-bind:src="plat.picture" v-bind:alt="plat.nom">
+        </div>
+        <div class="platText">
+            <h2 class="nomPlat"> {{plat.nom}}</h2>
+            <p class="description">{{plat.description}}</p>
+            <div v-if="!isAdmin" class="commander">
+                <FORM class="quantProd">
+                  <SELECT size="1" v-model="plat.nombre">
+                    <option>0</option>
+                    <OPTION>1</option>
+                    <OPTION>2</option>
+                    <OPTION>3</option>
+                    <OPTION>4</option>
+                    <OPTION>5</option>
+                   </SELECT>
+                </FORM>                        
+                <button class="commander">Commander {{plat.nombre}}*{{plat.prix}}</button>
+            </div>
+            <div v-else class="modifierplat">
+            <form class="modifiePlatForm">
+            <div class="platPicForm">
+            <label for="platPic">Image: </label>
+            <input id="platPic" type="text" v-model="plat.picture">
+            </div>
+            <div class="nomPlatForm">
+            <label for="nomPlat">Nom du plat:</label>
+            <input id="nomPlat" type="text" v-model="plat.nom">
+            </div>
+            <div class="descriptionPlatDiv">
+            <label for="descriptionPlat">Description: </label>
+            <input id="descriptionPlat" type="textarea" v-model="plat.description">
+            </div>
+            <button class="validerChangePlat" v-on:click="validerChangePlat">Valider</button>
+            <button class="supprimerPlat" v-on:click.stop.prevent="supprimerPlat">Supprimer</button>
+            </form>
+            </div>
+        </div>
     </div>
     `,
-    props:['plat']
+        props:['plat','isAdmin'],
+        methods:{
+            validerChangePlat(){
+            },
+            supprimerPlat(plat){    
+                const newPlats=plats.filter((t)=>{
+                    return plat.id !=t.id
+                });
+                plats=newPlats;
+            }}
+
+        
 });
 Vue.component('componenthoraires',{
     template:`
@@ -85,7 +152,7 @@ Vue.component('componentchangehoraires',{
     </div>
     `,
     props:['day']
-})
+});
 Vue.component('logincomponent',{
     template:`
     <div class="connexion">
@@ -104,7 +171,7 @@ Vue.component('logincomponent',{
         return{
             titre:'Login Component',
             id:'Identifiant'
-        }
+        };
     }
 });
 Vue.component('admincomponent',{
@@ -128,7 +195,7 @@ Vue.component('coordoneescomponent',{
              phone:"05 51 49 26 53",
              email:"Kmeroun@gmail.com",
              facebook:'https://fr-fr.facebook.com/kmerounrestaurant/'
-         }
+         };
      }
 });
 
@@ -161,7 +228,7 @@ Vue.component('commandecomponent',{
          commandItems:[{id:1,nomPlat:"Bongo'o tjobi", prix:9},
          {id:2,nomPlat:"Rataplaf", prix:10}],
          total:19
-     }
+     };
  }
 });
 Vue.component('componentseparator',{
@@ -171,11 +238,11 @@ var app=new Vue({
     el:'#app',
     data:{
         logIn:false,
-        isAdmin:false,
+        isAdmin:true,
         counter:0,
         plats:[
-            {id:1,nom:'Bongo’o tjobi', picture:'./photosPlats/Mbongo.jpg',description:' Poisson frais ou viande (au choix) assaisonné d\'un mélange d\'épices et sauce noire'},
-            {id:2,nom:'Kpem',picture:'./photosPlats/Kpem.jpg', description:'Base de feuilles de manioc pilées, de jus de noix de palme et d\'aubergines africaines.'}
+            {id:1,nom:'Bongo’o tjobi', picture:'./photosPlats/Mbongo.jpg',description:' Poisson frais ou viande (au choix) assaisonné d\'un mélange d\'épices et sauce noire',prix:9,nombre:0},
+            {id:2,nom:'Kpem',picture:'./photosPlats/Kpem.jpg', description:'Base de feuilles de manioc pilées, de jus de noix de palme et d\'aubergines africaines.',prix:10,nombre:0}
         ],
         days:[{id:1,nom:'Lundi', ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
               {id:2,nom:"Mardi", ouvertureMatin:"10:00", fermetureMidi:"13:00", ouvertureSoir:"17:00", fermeturesoir:"22:00"},
@@ -196,7 +263,6 @@ var app=new Vue({
             
             this.isAdmin=!this.isAdmin;
             console.log("Admin:"+this.isAdmin);
-            
         }
     }
 });

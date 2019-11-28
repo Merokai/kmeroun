@@ -8,10 +8,8 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,300,700' rel=“stylesheet” type='text/css'>
     <title>Hackaton</title>
 </head>
-
 <body>
-
-<div id="app">
+<div id="app" v-bind:plats.sync="plats">
     <header>
         <containercomponent>
         </containercomponent>
@@ -38,15 +36,13 @@
                             </componentchangehoraires>
                             <button>Envoyer</button>
                         </form>
-                </div>
-                      
+                </div>    
             </aside>
             <section class="Menu">
-               <menutitrecomponent></menutitrecomponent>>
-                <platcomponent v-for="plat in plats" v-bind:key='plat.id' v-bind:plat='plat'>
+               <menutitrecomponent></menutitrecomponent v-bind:is-admin="isAdmin" v-bind:plats="plats">
+                <platcomponent v-for="plat in plats" v-bind:key='plat.id' v-bind:plat='plat' v-bind:is-admin="isAdmin">
             </platcomponent>
             </section>
-
         </div>
     </main>
 </div>

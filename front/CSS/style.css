@@ -217,3 +217,8 @@ ul{
 .time{
 	max-width:45px;
 }
+.modifiePlatForm{
+display:flex;
+flex-wrap: wrap;
+justify-content: space-between;
+}
