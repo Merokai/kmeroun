@@ -49,13 +49,12 @@ public class CartDao implements DaoInterface<Cart, Integer> {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Cart cart) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.createQuery("delete from Cart where id = :id");
-            session.setProperty("id", id);
+            session.delete(cart);
             tx.commit();
         } catch(Exception e){
             if(tx != null){

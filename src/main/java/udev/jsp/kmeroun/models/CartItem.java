@@ -13,6 +13,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.persistence.*;
 
+/**
+ * Json attributes:
+ * id (read-only)   int
+ * product          {@link Product}
+ * quantity         int
+ */
 @Table(name = "cartItems",
         uniqueConstraints=
         @UniqueConstraint(columnNames={"cart_id", "product_id"}))

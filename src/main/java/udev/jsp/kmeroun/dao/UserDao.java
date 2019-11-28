@@ -68,13 +68,12 @@ public class UserDao implements DaoInterface<User, Integer> {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(User user) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.createQuery("delete from User where id = :id");
-            session.setProperty("id", id);
+            session.delete(user);
             tx.commit();
         } catch(Exception e){
             if(tx != null){

@@ -1,4 +1,4 @@
-package udev.jsp.kmeroun.servlets.HttpRequestValidator;
+package udev.jsp.kmeroun.utils.HttpRequestValidator;
 
 import udev.jsp.kmeroun.enums.Role;
 import udev.jsp.kmeroun.models.User;
@@ -21,7 +21,9 @@ public class UserHasRole implements HttpRequestValidator {
     @Override
     public boolean validate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User user = (User) request.getSession().getAttribute("user");
-        if(roles.contains(Role.GUEST) || user != null && roles.contains((user).getRole())) return true;
+        if(user == null && roles.contains(Role.GUEST) || user != null && roles.contains((user).getRole())){
+            return true;
+        }
         response.sendError(403);
         return false;
     }

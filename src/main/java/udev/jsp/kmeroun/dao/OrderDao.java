@@ -49,13 +49,12 @@ public class OrderDao implements DaoInterface<Order, Integer> {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Order order) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
         try{
             tx = session.beginTransaction();
-            session.createQuery("delete from Order where id = :id");
-            session.setProperty("id", id);
+            session.delete(order);
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -88,15 +87,15 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         return order;
     }
 
-    public List findCurrent(User user) {
+    public List<Order> findCurrent(User user) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        List orders = null;
+        List<Order> orders = null;
         try{
             tx = session.beginTransaction();
             Query query = session.createQuery("from Order where customer.id = :u");
             query.setParameter("u", user.getId());
-            orders = query.list();
+            orders = query.getResultList();
             tx.commit();
         } catch(Exception e){
             if(tx != null){
@@ -110,10 +109,10 @@ public class OrderDao implements DaoInterface<Order, Integer> {
     }
 
     @Override
-    public List findAll() {
+    public List<Order> findAll() {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        List orders = null;
+        List<Order> orders = null;
         try{
             tx = session.beginTransaction();
             Query query = session.createQuery("from Order");
@@ -130,10 +129,10 @@ public class OrderDao implements DaoInterface<Order, Integer> {
         return orders;
     }
 
-    public List findAllForUser(User user) {
+    public List<Order> findAllForUser(User user) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         Transaction tx = null;
-        List orders = null;
+        List<Order> orders = null;
         try{
             tx = session.beginTransaction();
             Query query = session.createQuery("from Order inner join Cart where customer.id = :u");

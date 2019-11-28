@@ -6,6 +6,10 @@ import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 import javax.persistence.*;
 import java.io.Serializable;
 
+
+/**
+ * Json attributes: see {@link Product}
+ */
 @Table(name = "dishes")
 @Entity
 public class Dish extends Product implements Serializable {

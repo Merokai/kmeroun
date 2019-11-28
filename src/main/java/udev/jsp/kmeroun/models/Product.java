@@ -8,6 +8,14 @@ import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 import javax.persistence.*;
 import java.io.Serializable;
 
+
+/**
+ * Json attributes:
+ * id (read-only)   int
+ * name             String
+ * price            double
+ */
+
 @Table(name = "products")
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)

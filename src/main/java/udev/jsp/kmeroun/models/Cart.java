@@ -12,6 +12,11 @@ import udev.jsp.kmeroun.utils.SerializableArrayList;
 
 import javax.persistence.*;
 
+/**
+ * Json attributes:
+ * id (read-only)   int
+ * cartItems        ${@link CartItem}
+ */
 @Table(name = "carts")
 @Entity
 public class Cart implements Serializable {
@@ -25,7 +30,7 @@ public class Cart implements Serializable {
 
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "customer_id")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private User customer;
 
     @JsonIgnore

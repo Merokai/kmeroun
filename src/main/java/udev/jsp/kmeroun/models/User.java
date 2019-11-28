@@ -7,13 +7,20 @@ import udev.jsp.kmeroun.enums.Role;
 import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 import udev.jsp.kmeroun.utils.PasswordHash;
 
-import javax.annotation.Generated;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-
+/**
+ * Json attributes:
+ * id (read-only)   int
+ * username         String
+ * password (write-only) String
+ * lastname         String
+ * firstname        String
+ * role             {@link Role}
+ */
 @Entity
 @Table(name="users")
 public class User implements Serializable {

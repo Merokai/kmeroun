@@ -5,16 +5,16 @@ import java.util.List;
 
 public interface DaoInterface<T, Id extends Serializable> {
 
-    public void save(T entity);
+    void save(T entity);
 
-    public void update(T entity);
+    void update(T entity);
 
-    public void delete(Id id);
+    void delete(T entity);
 
-    public T get(Id id);
+    T get(Id id);
 
-    public List<T> findAll();
+    List<T> findAll();
 
-    public void deleteAll();
+    void deleteAll();
 
 }

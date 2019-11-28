@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import udev.jsp.kmeroun.enums.OrderStatus;
 
+import udev.jsp.kmeroun.enums.OrderType;
 import udev.jsp.kmeroun.utils.JacksonObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,12 +15,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.persistence.*;
 
+/**
+ * Json attributes:
+ * id (read-only)   int
+ * cart (read-only) {@link Cart}
+ * status (read-only) {@link OrderStatus}
+ * orderType        {@link OrderType}
+ * createdOn        LocalDateTime
+ */
 @Table(name = "orders")
 @Entity
 public class Order implements Serializable {
 
     @Id
-    @JsonIgnore
     @Column(name = "order_id")
     @GeneratedValue
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -27,12 +35,17 @@ public class Order implements Serializable {
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name="cart_id")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Cart cart;
 
     @Column(name = "order_status", nullable = false)
     @Enumerated(EnumType.STRING)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private OrderStatus status;
+
+    @Column(name = "order_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderType orderType;
 
     @Column(name = "order_creation", nullable = false)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -87,5 +100,13 @@ public class Order implements Serializable {
 
     public void setCart(Cart cart) {
         this.cart = cart;
+    }
+
+    public OrderType getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(OrderType orderType) {
+        this.orderType = orderType;
     }
 }

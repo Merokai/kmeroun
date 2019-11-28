@@ -1,4 +1,4 @@
-package udev.jsp.kmeroun.servlets.HttpRequestValidator;
+package udev.jsp.kmeroun.utils.HttpRequestValidator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

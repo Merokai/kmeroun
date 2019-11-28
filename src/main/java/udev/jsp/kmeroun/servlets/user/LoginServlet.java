@@ -1,10 +1,10 @@
-package udev.jsp.kmeroun.servlets;
+package udev.jsp.kmeroun.servlets.user;
 
 import udev.jsp.kmeroun.dao.UserDao;
 import udev.jsp.kmeroun.enums.Role;
 import udev.jsp.kmeroun.models.User;
-import udev.jsp.kmeroun.servlets.HttpRequestValidator.HttpRequestValidator;
-import udev.jsp.kmeroun.servlets.HttpRequestValidator.UserHasRole;
+import udev.jsp.kmeroun.utils.HttpRequestValidator.HttpRequestValidator;
+import udev.jsp.kmeroun.utils.HttpRequestValidator.UserHasRole;
 import udev.jsp.kmeroun.utils.HttpBodyParser;
 import udev.jsp.kmeroun.utils.PasswordHash;
 
@@ -16,17 +16,34 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/login")
+@WebServlet("/user/login")
 public class LoginServlet extends HttpServlet {
     private static final UserDao userDao = new UserDao();
 
+    /**
+     * POST /user/login
+     * {@link User} login
+     * Require json user as content body
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        login(request, response);
+        HttpRequestValidator.validate(request, response, this::login, new UserHasRole(Role.GUEST));
     }
 
+    /**
+     * GET /user/login
+     * Get logged in {@link User} informations
+     * Require logged in CUSTOMER or MANAGER
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpRequestValidator.validate(request, response, this::getUserInfo, new UserHasRole(Role.CUSTOMER, Role.MANAGER));
-        request.getRequestDispatcher("WEB-INF/userInfo.jsp").forward(request, response);
     }
 
     private void login(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
