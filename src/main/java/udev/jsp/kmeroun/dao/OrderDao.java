@@ -3,98 +3,168 @@ package udev.jsp.kmeroun.dao;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-import udev.jsp.kmeroun.models.Dish;
 import udev.jsp.kmeroun.models.Order;
 import udev.jsp.kmeroun.models.User;
 import udev.jsp.kmeroun.utils.HibernateSessionFactory;
-import udev.jsp.kmeroun.utils.SerializableArrayList;
 
 import java.util.List;
 
-public class OrderDao {
-    public void saveOrder(Order order){
-        Transaction transaction = null;
-        try(Session session = HibernateSessionFactory.getSessionFactory().openSession()){
-            transaction = session.beginTransaction();
+public class OrderDao implements DaoInterface<Order, Integer> {
+
+    @Override
+    public void save(Order order) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
             session.save(order);
-            transaction.commit();
-        } catch (Exception e){
-            if(transaction != null){
-                transaction.rollback();
+            session.update(order.getCart());
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
     }
 
-    public void updateOrder(Order order) {
-        Transaction transaction = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
+    @Override
+    public void update(Order order) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
             session.update(order);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
     }
 
-    public void deleteOrder(int id) {
-
-        Transaction transaction = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            Order order = session.get(Order.class, id);
-            if (order != null) {
-                session.delete(order);
+    @Override
+    public void delete(Order order) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
+            session.delete(order);
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
     }
 
-    public Order getOrder(int id) {
-
-        Transaction transaction = null;
+    @Override
+    public Order get(Integer id) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
         Order order = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            order = session.get(Order.class, id);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+        try{
+            tx = session.beginTransaction();
+            order = session.load(Order.class, id);
+            tx.commit();
+            return order;
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
         return order;
     }
 
-    public SerializableArrayList<Order> getOrders() {
-        SerializableArrayList<Order> orderList = new SerializableArrayList<>();
-
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            orderList.addAll(session.createQuery(" from Order", Order.class).list());
-        } catch (Exception e) {
-            e.printStackTrace();
+    public List<Order> findCurrent(User user) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        List<Order> orders = null;
+        try{
+            tx = session.beginTransaction();
+            Query query = session.createQuery("from Order where customer.id = :u");
+            query.setParameter("u", user.getId());
+            orders = query.getResultList();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
         }
-        return orderList;
+        return orders;
     }
 
-    public Order getCurrentOrder(String username){
-        Order order = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            Query query = session.createQuery(" from Order WHERE customer_username = :c AND (status = 'CREATION' OR status = 'PREPARATION' OR status = 'WAITING_DELIVERY')", Order.class);
-            query.setParameter("c", username);
-            order = (Order) query.uniqueResult();
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public List<Order> findAll() {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        List<Order> orders = null;
+        try{
+            tx = session.beginTransaction();
+            Query query = session.createQuery("from Order");
+            orders = query.getResultList();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
         }
-        return order;
+        return orders;
+    }
+
+    public List<Order> findAllForUser(User user) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        List<Order> orders = null;
+        try{
+            tx = session.beginTransaction();
+            Query query = session.createQuery("from Order inner join Cart where customer.id = :u");
+            query.setParameter("u", user.getId());
+            orders = query.getResultList();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
+        }
+        return orders;
+    }
+
+    @Override
+    public void deleteAll() {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
+            session.createQuery("delete from Order");
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
+        }
     }
 }

@@ -1,95 +1,74 @@
 package udev.jsp.kmeroun.models;
 
+import java.time.LocalDate;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import udev.jsp.kmeroun.enums.OrderStatus;
+
+import udev.jsp.kmeroun.enums.OrderType;
+import udev.jsp.kmeroun.utils.JacksonObjectMapper;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
-import org.hibernate.annotations.GeneratorType;
-import org.hibernate.annotations.ValueGenerationType;
-import org.hibernate.tuple.ValueGenerator;
-import udev.jsp.kmeroun.enums.OrderStatus;
-import udev.jsp.kmeroun.events.OrderStatusChangedEvent;
-import udev.jsp.kmeroun.listeners.OrderStatusListener;
-import udev.jsp.kmeroun.utils.JacksonObjectMapper;
-import udev.jsp.kmeroun.utils.SerializableArrayList;
 
 import javax.persistence.*;
-import javax.swing.event.EventListenerList;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.List;
 
+/**
+ * Json attributes:
+ * id (read-only)   int
+ * cart (read-only) {@link Cart}
+ * status (read-only) {@link OrderStatus}
+ * orderType        {@link OrderType}
+ * createdOn        LocalDateTime
+ */
+@Table(name = "orders")
 @Entity
-@Table(name="orders")
 public class Order implements Serializable {
 
     @Id
-    @Column(name = "id")
-    @JsonIgnore
+    @Column(name = "order_id")
+    @GeneratedValue
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int id;
 
-    @JsonIgnore
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "customer_username")
-    private User customer;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<OrderRow> orderRowList = new SerializableArrayList<>();
-
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name="cart_id")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Cart cart;
+
+    @Column(name = "order_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private OrderStatus status;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "createdOn")
-    private LocalDate createdOn;
+    @Column(name = "order_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderType orderType;
 
-    @JsonIgnore
-    @Transient
-    private EventListenerList listeners;
+    @Column(name = "order_creation", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime createdOn;
 
     public Order(){
-        listeners = new EventListenerList();
+        super();
     }
 
-    public void setCustomer(User customer) {
-        this.customer = customer;
-    }
-
-    public User getCustomer() {
-        return customer;
-    }
-
-    public void setOrderRowList(List<OrderRow> orderRowList) {
-        this.orderRowList = orderRowList;
-    }
-
-    public List<OrderRow> getOrderRowList() {
-        return orderRowList;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-        fireOrderStatusChanged();
-    }
     public OrderStatus getStatus() {
         return status;
     }
 
-    public void addListener(OrderStatusListener listener) {
-        this.listeners.add(OrderStatusListener.class, listener);
+    public void setStatus(OrderStatus status) {
+        this.status = status;
     }
 
-    public void removeListener(OrderStatusListener listener) {
-        this.listeners.remove(OrderStatusListener.class, listener);
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
     }
 
-    private void fireOrderStatusChanged(){
-        for(OrderStatusListener listener : listeners.getListeners(OrderStatusListener.class)){
-            listener.orderStatusChanged(new OrderStatusChangedEvent(this, getStatus()));
-        }
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 
     @Override
@@ -107,19 +86,27 @@ public class Order implements Serializable {
         return JacksonObjectMapper.getInstance().readValue(json, Order.class);
     }
 
-    public LocalDate getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDate createdOn) {
-        this.createdOn = createdOn;
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public OrderType getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(OrderType orderType) {
+        this.orderType = orderType;
     }
 }

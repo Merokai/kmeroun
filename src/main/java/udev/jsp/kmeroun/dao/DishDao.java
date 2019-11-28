@@ -2,83 +2,124 @@ package udev.jsp.kmeroun.dao;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import udev.jsp.kmeroun.models.Dish;
 import udev.jsp.kmeroun.utils.HibernateSessionFactory;
-import udev.jsp.kmeroun.utils.SerializableArrayList;
 
+import java.util.List;
 
-public class DishDao {
-    public void saveDish(Dish dish){
-        Transaction transaction = null;
-        try(Session session = HibernateSessionFactory.getSessionFactory().openSession()){
-            transaction = session.beginTransaction();
+public class DishDao implements DaoInterface<Dish, Integer> {
+
+    @Override
+    public void save(Dish dish) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
             session.save(dish);
-            transaction.commit();
-        } catch (Exception e){
-            if(transaction != null){
-                transaction.rollback();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
     }
 
-    public void updateDish(Dish dish) {
-        Transaction transaction = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
+    @Override
+    public void update(Dish dish) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
             session.update(dish);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
     }
 
-    public void deleteDish(int id) {
-
-        Transaction transaction = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            Dish dish = session.get(Dish.class, id);
-            if (dish != null) {
-                session.delete(dish);
+    @Override
+    public void delete(Dish dish) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
+            session.delete(dish);
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
     }
 
-    public Dish getDish(int id) {
-
-        Transaction transaction = null;
+    @Override
+    public Dish get(Integer id) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
         Dish dish = null;
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            dish = session.get(Dish.class, id);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+        try{
+            tx = session.beginTransaction();
+            dish = session.load(Dish.class, id);
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
             }
-            e.printStackTrace();
+        } finally{
+            session.close();
         }
         return dish;
     }
 
-    public SerializableArrayList<Dish> getDishes() {
-        SerializableArrayList<Dish> dishList = new SerializableArrayList<>();
-
-        try (Session session = HibernateSessionFactory.getSessionFactory().openSession()) {
-            dishList.addAll(session.createQuery(" FROM Dish", Dish.class).list());
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public List<Dish> findAll() {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        List<Dish> dishes = null;
+        try{
+            tx = session.beginTransaction();
+            Query query = session.createQuery("from Dish");
+            dishes = query.list();
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
         }
-        return dishList;
+        return dishes;
+    }
+
+    @Override
+    public void deleteAll() {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
+            session.createQuery("delete from Dish");
+            tx.commit();
+        } catch(Exception e){
+            if(tx != null){
+                tx.rollback();
+                throw e;
+            }
+        } finally{
+            session.close();
+        }
     }
 }
