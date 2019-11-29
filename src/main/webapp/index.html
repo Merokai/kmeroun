@@ -1,10 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" media="screen" href="CSS/style.css">   
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,300,700' rel=“stylesheet” type='text/css'>
+    <title>Hackaton</title>
 </head>
+
 <body>
-	<p> yop </p>
+
+<div id="app">
+    <header>
+        <containercomponent>
+        </containercomponent>
+    </header>
+    <main>
+        <div class="contenu">
+            <aside class="barreGauche">
+                <loginofcomponent ></loginofcomponent>
+                <logincomponent v-if="connexion">
+                </logincomponent>
+                <admincomponent v-if="logIn && isAdmin">
+                </admincomponent>
+                <commandecomponent v-else-if="logIn"> 
+                </commandecomponent>
+                <componentseparator></componentseparator>
+               <coordoneescomponent></coordoneescomponent>
+                <componentseparator></componentseparator>
+                <div class="horaires">
+                        <h3 class="titreHoraires"> Horaires d'ouverture </h3>
+                        <componenthoraires v-if="!isAdmin" v-for="day in days" v-bind:key='day.id' v-bind:day="day"></componenthoraires>
+                        <form v-if="isAdmin">
+                            <componentchangehoraires v-for="day in days" v-bind:key='day.id' v-bind:day="day">
+
+                            </componentchangehoraires>
+                            <button>Envoyer</button>
+                        </form>
+                </div>
+                      
+            </aside>
+            <section class="Menu">
+               <menutitrecomponent></menutitrecomponent>>
+                <platcomponent v-for="plat in plats" v-bind:key='plat.id' v-bind:plat='plat'>
+            </platcomponent>
+            </section>
+
+        </div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="App.js"></script>
 </body>
 </html>
